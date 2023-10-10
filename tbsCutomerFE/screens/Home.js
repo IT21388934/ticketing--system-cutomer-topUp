@@ -22,7 +22,7 @@ const Home = () => {
           source={require("../assets/images/logo1.png")} // Replace with your logo image
           style={styles.logo}
         />
-        <Text style={styles.headerText}>Welcome, Rumesh</Text>
+        {/* <Text style={styles.headerText}>Welcome, Rumesh</Text> */}
       </View>
       <ScrollView style={styles.container}>
         {/* Wallet Balance */}
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
     paddingLeft: 20,
     paddingRight: 20,
     paddingTop: 40,

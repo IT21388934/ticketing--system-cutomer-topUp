@@ -16,7 +16,7 @@ import { COLORS } from "../constant/theme";
 import loginAndSignUpStyle from "../global/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 
-export default function Login() {
+export default function Login({ navigation }) {
   const [values, setValues] = useState({ email: "", password: "" });
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -32,6 +32,7 @@ export default function Login() {
     console.log("Form Submitted!");
     console.log("Email:", values.email);
     console.log("Password:", values.password);
+    navigation.navigate("Home");
   };
 
   return (
@@ -101,7 +102,10 @@ export default function Login() {
                   Login Now
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={loginAndSignUpStyle.newUser}>
+              <TouchableOpacity
+                style={loginAndSignUpStyle.newUser}
+                onPress={() => navigation.navigate("SignUp")}
+              >
                 <Text style={loginAndSignUpStyle.forgotPasswordText}>
                   New user? Sign up
                 </Text>

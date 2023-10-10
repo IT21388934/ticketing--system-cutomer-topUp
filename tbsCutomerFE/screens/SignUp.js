@@ -18,7 +18,7 @@ import loginAndSignUpStyle from "../global/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function SignUp() {
+export default function SignUp({ navigation }) {
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -53,6 +53,8 @@ export default function SignUp() {
     console.log("Last Name:", values.lastName);
     console.log("NIC:", values.nic);
     console.log("DOB:", values.dob);
+
+    navigation.navigate("Home");
   };
 
   const [date, setDate] = useState(new Date());
@@ -218,10 +220,13 @@ export default function SignUp() {
                 onPress={handleSubmit}
               >
                 <Text style={loginAndSignUpStyle.loginButtonText}>
-                  Login Now
+                  SingUp Now
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={loginAndSignUpStyle.newUser}>
+              <TouchableOpacity
+                style={loginAndSignUpStyle.newUser}
+                onPress={() => navigation.navigate("Login")}
+              >
                 <Text style={loginAndSignUpStyle.forgotPasswordText}>
                   Already have an account? Login
                 </Text>

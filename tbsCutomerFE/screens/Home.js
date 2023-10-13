@@ -12,6 +12,7 @@ import { COLORS } from "../constant/theme";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const Home = () => {
   return (
@@ -27,12 +28,12 @@ const Home = () => {
       <ScrollView style={styles.container}>
         {/* Wallet Balance */}
         <View style={styles.balanceContainer}>
-          {/* <TouchableOpacity style={styles.topUpBtn}>
-          <Text style={styles.topUpText}> Top Up</Text>
-        </TouchableOpacity> */}
+          <TouchableOpacity style={styles.topUpBtn}>
+            <Text style={styles.topUpText}> Top Up</Text>
+          </TouchableOpacity>
           <Text style={styles.balanceText}>Token Balance :</Text>
           <View style={styles.balanceAmountContainer}>
-            <Text style={styles.balanceAmount}>Rs : 10,000.00</Text>
+            <Text style={styles.balanceAmount}>Rs : 12,000.00</Text>
           </View>
         </View>
 
@@ -53,9 +54,9 @@ const Home = () => {
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainer}>
             <View style={styles.button}>
-              <FontAwesome name="money" size={25} color="white" />
+              <MaterialIcons name="history" size={24} color="white" />
             </View>
-            <Text style={styles.buttonText}>Top Up</Text>
+            <Text style={styles.buttonText}>My Journeys</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buttonContainer}>
             <View style={styles.button}>
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
   balanceContainer: {
     position: "relative",
     width: 350,
-    height: 120,
+    height: 150,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
@@ -201,6 +202,9 @@ const styles = StyleSheet.create({
     // borderBottomColor: "#ddd",
   },
   buttonContainer: {
+    // alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
   },
   button: {
@@ -227,8 +231,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: COLORS.secondaryBlue,
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "bold",
+    flexWrap: "wrap",
+    textAlign: "center",
   },
   transactions: {
     padding: 20,
@@ -238,6 +244,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  topUpBtn: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    width: 80,
+    height: 30,
+    backgroundColor: COLORS.lightBlue,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  topUpText: {
+    color: COLORS.white,
+    fontWeight: "900",
+  },
+
   // Add more styles for transaction items if needed
 });
 

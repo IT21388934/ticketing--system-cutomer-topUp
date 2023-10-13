@@ -2,6 +2,7 @@ const COLORS = {
   primary: "#3865d8", //login background, button background
   endGradientBlue: "#2150c6", //login background
   secondaryBlue: "#001C55", //background
+  lightBlue: "#698fef", //background
 
   white: "#FFFFFF", // fonts
   black: "#1B262E", // fonts

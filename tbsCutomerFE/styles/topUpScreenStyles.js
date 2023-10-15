@@ -21,11 +21,24 @@ const topUpScreenStyles = StyleSheet.create({
   input: {
     width: "80%",
     height: 40,
-    borderColor: "gray",
+    borderColor: COLORS.secondaryBlue,
     borderWidth: 1,
+    borderRadius: 5,
     marginBottom: 10,
     padding: 5,
     alignSelf: "center",
+    color: COLORS.white,
+  },
+  amountInput: {
+    width: "80%",
+    height: 40,
+    borderColor: COLORS.secondaryBlue,
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    padding: 5,
+    alignSelf: "center",
+    color: COLORS.black,
   },
   ProceedBtn: {
     width: "80%",
@@ -63,6 +76,7 @@ const topUpScreenStyles = StyleSheet.create({
   cardLabel: {
     fontSize: 16,
     marginBottom: 5,
+    color: COLORS.white,
   },
 
   submitButton: {

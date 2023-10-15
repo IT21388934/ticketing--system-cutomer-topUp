@@ -10,6 +10,7 @@ import {
   Button,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../constant/theme";
@@ -107,12 +108,13 @@ export default function Login({ navigation }) {
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <LinearGradient
+      {/* <LinearGradient
         colors={[COLORS.primary, COLORS.endGradientBlue]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 0.9 }}
         style={loginAndSignUpStyle.gradientBackground}
-      >
+      > */}
+      <ScrollView contentContainerStyle={loginAndSignUpStyle.scrollView}>
         <View style={loginAndSignUpStyle.container}>
           <ImageBackground
             source={require("../assets/images/loginbg.png")}
@@ -187,7 +189,8 @@ export default function Login({ navigation }) {
             </View>
           </ImageBackground>
         </View>
-      </LinearGradient>
+        {/* </LinearGradient> */}
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 }

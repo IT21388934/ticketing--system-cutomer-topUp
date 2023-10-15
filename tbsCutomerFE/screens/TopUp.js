@@ -43,7 +43,11 @@ export default function TopUp({ navigation, route }) {
   const [cvc, setCVC] = useState("");
 
   const toggleCreditCardPopup = () => {
-    setShowCreditCardPopup(!showCreditCardPopup);
+    if (topupAmount <= 0 || topupAmount == "") {
+      alert("Please enter a valid top-up amount");
+    } else {
+      setShowCreditCardPopup(!showCreditCardPopup);
+    }
   };
 
   const handleClosePopup = () => {
@@ -66,6 +70,7 @@ export default function TopUp({ navigation, route }) {
         setMessage(message);
         setMessageType("success");
         setShowCreditCardPopup(false);
+        setTopupAmount("");
       } else {
         alert(message);
       }
@@ -101,7 +106,7 @@ export default function TopUp({ navigation, route }) {
             Current Balance: Rs: {balance}
           </Text>
           <TextInput
-            style={topUpScreenStyles.input}
+            style={topUpScreenStyles.amountInput}
             placeholder="Enter top-up amount"
             value={topupAmount}
             onChangeText={(numeric) => setTopupAmount(numeric)}

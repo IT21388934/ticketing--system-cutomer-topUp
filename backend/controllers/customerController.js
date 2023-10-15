@@ -25,14 +25,14 @@ exports.getCustomerById = async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
     res.status(200).json({
-      status: "success",
+      success: true,
       data: {
         customer,
       },
     });
   } catch (err) {
     res.status(404).json({
-      status: "fail",
+      success: false,
       message: err,
     });
   }
@@ -46,14 +46,14 @@ exports.updateCustomerById = async (req, res) => {
       runValidators: true,
     });
     res.status(200).json({
-      status: "success",
+      success: true,
       data: {
         customer,
       },
     });
   } catch (err) {
     res.status(400).json({
-      status: "fail",
+      success: false,
       message: err,
     });
   }
@@ -64,12 +64,12 @@ exports.deleteCustomerById = async (req, res) => {
   try {
     await Customer.findByIdAndDelete(req.params.id);
     res.status(204).json({
-      status: "success",
+      success: true,
       data: null,
     });
   } catch (err) {
     res.status(400).json({
-      status: "fail",
+      success: false,
       message: err,
     });
   }
@@ -129,52 +129,6 @@ exports.signUp = async (req, res) => {
 // const bcrypt = require("bcryptjs");
 
 // Login a customer
-// exports.login = async (req, res) => {
-//   try {
-//     // Extract email and password from the request body
-//     const { email, password } = req.body;
-
-//     // Find the customer with the given email
-//     const customer = await Customer.findOne({ email });
-
-//     // If the customer is not found, respond with an error message
-//     if (!customer) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Invalid email or password",
-//       });
-//     }
-
-//     // Compare the password with the hashed password in the database
-//     const isMatch = await bcrypt.compare(password, customer.password);
-
-//     // If the password does not match, respond with an error message
-//     if (!isMatch) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Invalid email or password",
-//       });
-//     }
-
-//     // If the email and password are correct, respond with a success message and the customer data
-//     res.status(200).json({
-//       success: true,
-//       message: "Login successful",
-//       customer: customer,
-//     });
-//   } catch (error) {
-//     // Handle login errors
-//     res.status(400).json({
-//       success: false,
-//       message: "Login failed",
-//       error: error.message,
-//     });
-//   }
-// };
-
-//login
-
-// Login a customer
 exports.login = async (req, res) => {
   try {
     // Extract email and password from the request body
@@ -187,7 +141,7 @@ exports.login = async (req, res) => {
     if (!customer) {
       return res.status(401).json({
         success: false,
-        message: "Invalid nic or password",
+        message: "Invalid email or password",
       });
     }
 
@@ -198,7 +152,7 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid nic or password",
+        message: "Invalid email or password",
       });
     }
 
@@ -206,7 +160,7 @@ exports.login = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Login successful",
-      data: customer,
+      customer: customer,
     });
   } catch (error) {
     // Handle login errors

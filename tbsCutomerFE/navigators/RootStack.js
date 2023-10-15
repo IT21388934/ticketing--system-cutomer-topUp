@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "../screens/Login";
 import SignUp from "../screens/SignUp";
 import Home from "../screens/Home";
+import TopUp from "../screens/TopUp";
+import Myqr from "../screens/Myqr";
 
 import COLORS from "../constant/theme";
 
@@ -34,6 +36,8 @@ const RootStack = () => {
           component={SignUp}
         />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="TopUp" component={TopUp} />
+        <Stack.Screen name="Myqr" component={Myqr} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../constant/theme";
-import loginAndSignUpStyle from "../global/loginAndSignUpStyle";
+import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import CustomToast from "../components/CustomToast";
 
@@ -73,48 +73,41 @@ export default function Login({ navigation }) {
   //   // };
   //   // console.log(data);
   // };
-  async function handleSubmit() {
-    var data = {
-      nic: nic,
-      password: password,
-    };
-
-    await axios({
-      url: "http://192.168.8.131:3003/api/customers/login",
-      method: "POST",
-      data: data,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then(function (response) {
-        // handle success
-        console.log(response.data);
-        setNic("");
-        setPassword("");
-
-        const { message, data, success } = response.data;
-        if (success) {
-          navigation.navigate("Home");
-        } else {
-          setMessage(message);
-          setMessageType("error");
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        "http://192.168.8.131:3003/api/customers/login",
+        {
+          nic,
+          password,
         }
+      );
 
-        // Alert.alert("added");
-      })
-      .catch(function (error, response) {
-        // handle error
-        console.log(error);
-        console.log(response);
-        // if (response === undefined) {
-        //   setMessage("Nic or password Incorrect");
-        // }
-        setMessage("Nic or Password Incorrect");
-      });
-  }
+      if (response.data.success) {
+        const { data, success, message } = response.data;
+        console.log(message);
+        // Login successful
+        setMessage("Login successful");
+        console.log(response.data.customer);
+        const customer = response.data.customer;
 
+        navigation.navigate("Home", { customer: customer });
+      } else {
+        // Login failed, display the error message
+        setMessage("Invalid password or NIC");
+        setMessageType("error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+
+      if (error.response && error.response.status === 401) {
+        setMessage("Invalid nic or password");
+        setMessageType("error");
+      } else {
+        setMessage("Login failed");
+      }
+    }
+  };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <LinearGradient

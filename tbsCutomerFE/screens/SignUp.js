@@ -10,13 +10,15 @@ import {
   Button,
   Keyboard,
   TouchableWithoutFeedback,
-  ScrollView, // Import ScrollView from react-native
+  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../constant/theme";
-import loginAndSignUpStyle from "../global/loginAndSignUpStyle";
+import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+
+import axios from "axios";
 
 export default function SignUp({ navigation }) {
   const [values, setValues] = useState({
@@ -42,20 +44,43 @@ export default function SignUp({ navigation }) {
     setIsConformPasswordVisible(!isConformPasswordVisible);
   };
 
-  const handleSubmit = () => {
-    // Implement your form submission logic here
-    // For example, you can send a request to your server with the form data
-    // You can access the form values from the 'values' state (values.email and values.password)
-    console.log("Form Submitted!");
-    console.log("Email:", values.email);
-    console.log("Password:", values.password);
-    console.log("First Name:", values.firstName);
-    console.log("Last Name:", values.lastName);
-    console.log("NIC:", values.nic);
-    console.log("DOB:", values.dob);
+  async function handleSubmit() {
+    var data = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      dob: values.dob,
+      nic: values.nic,
+      email: values.email,
+      password: values.password,
+    };
 
-    navigation.navigate("Home");
-  };
+    await axios({
+      url: "http://192.168.8.131:3003/api/customers/signUp",
+      method: "POST",
+      data: data,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then(function (response) {
+        // handle success
+        const { success } = response.data;
+        if (success) {
+          console.log(response.data.customer);
+          const { customer } = response.data;
+          navigation.navigate("Home", { customer: customer });
+        } else {
+          console.log(response.data);
+          alert(response.data.message);
+        }
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        console.log("async error");
+      });
+  }
 
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);

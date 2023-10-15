@@ -27,6 +27,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //import credentials context
 import { CredentialsContext } from "../context/CredentialsContext";
 
+//import Components
+import CustomToast from "../components/CustomToast";
+
+//import Validations
+import * as ValidationUtils from "../validations/Validation";
+
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,6 +41,9 @@ export default function SignUp({ navigation }) {
   const [nic, setNic] = useState("");
   const [conformPassword, setConformPassword] = useState("");
   const [dob, setDob] = useState("");
+
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConformPasswordVisible, setIsConformPasswordVisible] =
@@ -69,29 +78,46 @@ export default function SignUp({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    try {
-      const response = await axios.post(
-        "http://192.168.8.131:3003/api/customers/signUp",
-        {
-          firstName,
-          lastName,
-          nic,
-          dob,
-          email,
-          password,
+    // Perform validation using the imported functions
+    const formData = {
+      nic,
+      firstName,
+      lastName,
+      dob,
+      email,
+      password,
+      conformPassword,
+    };
+    const validationResult = ValidationUtils.validateSignUp(formData);
+
+    if (validationResult.message) {
+      setMessage(validationResult.message);
+      setMessageType(validationResult.messageType);
+    } else {
+      try {
+        const response = await axios.post(
+          "http://192.168.8.131:3003/api/customers/signUp",
+          {
+            firstName,
+            lastName,
+            nic,
+            dob,
+            email,
+            password,
+          }
+        );
+        if (response.data.success) {
+          const customer = response.data;
+          console.log(customer);
+          console.log("Sign up successful");
+          // navigation.navigate("Home", { customer: customer });
+          persistSignUp(customer);
+        } else {
+          console.log(response);
         }
-      );
-      if (response.data.success) {
-        const customer = response.data;
-        console.log(customer);
-        console.log("Sign up successful");
-        // navigation.navigate("Home", { customer: customer });
-        persistSignUp(customer);
-      } else {
-        console.log(response);
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
   };
 
@@ -111,13 +137,7 @@ export default function SignUp({ navigation }) {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <LinearGradient
-        colors={[COLORS.primary, COLORS.endGradientBlue]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 0.9 }}
-        style={loginAndSignUpStyle.gradientBackground}
-      >
-        {/* <ScrollView contentContainerStyle={loginAndSignUpStyle.scrollView}> */}
+      <ScrollView contentContainerStyle={loginAndSignUpStyle.scrollView}>
         <View style={loginAndSignUpStyle.container}>
           <ImageBackground
             source={require("../assets/images/loginbg.png")}
@@ -252,6 +272,12 @@ export default function SignUp({ navigation }) {
                 style={loginAndSignUpStyle.newUser}
                 onPress={() => navigation.navigate("Login")}
               >
+                {/* custom toast message  */}
+                {message !== "" && (
+                  <CustomToast message={message} type={messageType} />
+                )}
+                {/* custom toast message  */}
+
                 <Text style={loginAndSignUpStyle.forgotPasswordText}>
                   Already have an account? Login
                 </Text>
@@ -259,8 +285,8 @@ export default function SignUp({ navigation }) {
             </View>
           </ImageBackground>
         </View>
-        {/* </ScrollView> */}
-      </LinearGradient>
+      </ScrollView>
+      {/* </LinearGradient> */}
     </TouchableWithoutFeedback>
   );
 }

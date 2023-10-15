@@ -98,5 +98,11 @@ const loginAndSignUpStyle = StyleSheet.create({
     alignSelf: "center",
     marginTop: 20,
   },
+
+  scrollView: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
 });
 export default loginAndSignUpStyle;

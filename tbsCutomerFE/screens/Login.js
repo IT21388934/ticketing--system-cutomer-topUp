@@ -26,8 +26,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //import credentials context
 import { CredentialsContext } from "../context/CredentialsContext";
 
+//import Validation
+import * as Validation from "../validations/Validation";
+
 export default function Login({ navigation }) {
-  // const [values, setValues] = useState({ nic: "", password: "" });
   const [nic, setNic] = useState("");
   const [password, setPassword] = useState("");
 
@@ -43,40 +45,49 @@ export default function Login({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    try {
-      const response = await axios.post(
-        "http://192.168.8.131:3003/api/customers/login",
-        {
-          nic,
-          password,
+    const formData = { nic, password };
+
+    const ValidationResult = Validation.validateLogin(formData);
+
+    if (ValidationResult.message !== "") {
+      setMessage(ValidationResult.message);
+      setMessageType(ValidationResult.messageType);
+    } else {
+      try {
+        const response = await axios.post(
+          "http://192.168.8.131:3003/api/customers/login",
+          {
+            nic,
+            password,
+          }
+        );
+
+        if (response.data.success) {
+          const { data, success, message } = response.data;
+          console.log(message);
+          // Login successful
+          setMessage("Login successful");
+          setMessageType("success");
+          console.log(response.data.customer);
+          const customer = response.data;
+          console.log(customer);
+          persistLogin(customer);
+
+          // navigation.navigate("Home", { customer: customer });
+        } else {
+          // Login failed, display the error message
+          setMessage("Invalid password or NIC");
+          setMessageType("error");
         }
-      );
+      } catch (error) {
+        console.error("Error:", error);
 
-      if (response.data.success) {
-        const { data, success, message } = response.data;
-        console.log(message);
-        // Login successful
-        setMessage("Login successful");
-        setMessageType("success");
-        console.log(response.data.customer);
-        const customer = response.data;
-        console.log(customer);
-        persistLogin(customer);
-
-        // navigation.navigate("Home", { customer: customer });
-      } else {
-        // Login failed, display the error message
-        setMessage("Invalid password or NIC");
-        setMessageType("error");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-
-      if (error.response && error.response.status === 401) {
-        setMessage("Invalid nic or password");
-        setMessageType("error");
-      } else {
-        setMessage("Login failed");
+        if (error.response && error.response.status === 401) {
+          setMessage("Invalid nic or password");
+          setMessageType("error");
+        } else {
+          setMessage("Login failed");
+        }
       }
     }
   };

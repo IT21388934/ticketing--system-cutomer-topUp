@@ -26,6 +26,25 @@ import { COLORS } from "../constant/theme";
 //import fonts
 import { FontAwesome } from "@expo/vector-icons";
 
+/**
+ * TopUp screen
+ * state for store topup amount and balance of the customer
+ * state for store message and message type
+ *  state for store credit card details
+ * state for store show credit card popup
+ *
+ * handle popup
+ * handle close popup
+ *
+ * handle topup function
+ *
+ * TopUp UI
+ *
+ * @param {*} navigation
+ * @param {*} param0
+ * @returns
+ */
+
 export default function TopUp({ navigation, route }) {
   //set customer object
   const { customer } = route.params;

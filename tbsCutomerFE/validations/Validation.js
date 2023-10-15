@@ -1,3 +1,12 @@
+/**
+ * singUp validation
+ *
+ * login validation
+ *
+ * payment validation
+ *
+ */
+
 export function validateEmail(email) {
   const emailRegex = /\S+@\S+\.\S+/; // A simple email regex pattern
   return emailRegex.test(email);

@@ -18,43 +18,64 @@ import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import CustomToast from "../components/CustomToast";
 
-//import axios
+// Import axios for making HTTP requests
 import axios from "axios";
 
-//import AsyncStorage
+// Import AsyncStorage for storing data locally
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-//import credentials context
+// Import the CredentialsContext for user authentication
 import { CredentialsContext } from "../context/CredentialsContext";
 
-//import Validation
+// Import Validation for form validation
 import * as Validation from "../validations/Validation";
 
+/**
+ * * states for store nic and password
+ * states for store password visibility
+ * states for store message and message type
+ * handle password visibility
+ *
+ * handle submit function
+ * persist login
+ *
+ * Login UI
+ *
+ * @param {object} navigation - React Navigation object for screen navigation
+ * @returns {JSX.Element}
+ **/
 export default function Login({ navigation }) {
+  // States for storing NIC, password, password visibility, and message display
   const [nic, setNic] = useState("");
   const [password, setPassword] = useState("");
-
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
+  // Get user credentials and set them in the context
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
+  // Toggle visibility of password field
   const handlePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
+  // Handle user login
   const handleSubmit = async () => {
+    // Create an object with user input (NIC and password)
     const formData = { nic, password };
 
-    const ValidationResult = Validation.validateLogin(formData);
+    // Validate user input
+    const validationResult = Validation.validateLogin(formData);
 
-    if (ValidationResult.message !== "") {
-      setMessage(ValidationResult.message);
-      setMessageType(ValidationResult.messageType);
+    if (validationResult.message !== "") {
+      // Display a validation error message to the user
+      setMessage(validationResult.message);
+      setMessageType(validationResult.messageType);
     } else {
       try {
+        // Send a POST request to the server for user login
         const response = await axios.post(
           "http://192.168.8.131:3003/api/customers/login",
           {
@@ -66,14 +87,17 @@ export default function Login({ navigation }) {
         if (response.data.success) {
           const { data, success, message } = response.data;
           console.log(message);
-          // Login successful
+
+          // Display a success message to the user
           setMessage("Login successful");
           setMessageType("success");
-          console.log(response.data.customer);
+
+          // Store user data locally and set them in the context
           const customer = response.data;
           console.log(customer);
           persistLogin(customer);
 
+          // Navigate to the home screen
           // navigation.navigate("Home", { customer: customer });
         } else {
           // Login failed, display the error message
@@ -84,16 +108,18 @@ export default function Login({ navigation }) {
         console.error("Error:", error);
 
         if (error.response && error.response.status === 401) {
-          setMessage("Invalid nic or password");
+          // Display an error message for invalid NIC or password
+          setMessage("Invalid NIC or password");
           setMessageType("error");
         } else {
+          // Display a general error message for login failure
           setMessage("Login failed");
         }
       }
     }
   };
 
-  //persist login
+  // Persist user login data
   const persistLogin = (customer) => {
     AsyncStorage.setItem("customerKey", JSON.stringify(customer))
       .then(() => {
@@ -106,14 +132,9 @@ export default function Login({ navigation }) {
         setMessageType("error");
       });
   };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      {/* <LinearGradient
-        colors={[COLORS.primary, COLORS.endGradientBlue]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 0.9 }}
-        style={loginAndSignUpStyle.gradientBackground}
-      > */}
       <ScrollView contentContainerStyle={loginAndSignUpStyle.scrollView}>
         <View style={loginAndSignUpStyle.container}>
           <ImageBackground
@@ -122,25 +143,25 @@ export default function Login({ navigation }) {
           >
             <View style={loginAndSignUpStyle.loginFormContent}>
               <Text style={loginAndSignUpStyle.title}>Login</Text>
+
+              {/* NIC input field */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
                   placeholder="NIC"
                   placeholderTextColor={COLORS.darkGray}
                   onChangeText={(text) => setNic(text)}
-                  // value={values.nic}
-                  // onChangeText={onChangeNic(value)} // add this line
                   keyboardType="default"
                 />
               </View>
+
+              {/* Password input field with show/hide password option */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
                   placeholder="Password"
                   placeholderTextColor={COLORS.darkGray}
                   onChangeText={(text) => setPassword(text)}
-                  // onChangeText={onChangePassword(value)}
-                  // value={values.password}
                   secureTextEntry={!isPasswordVisible}
                 />
                 <TouchableOpacity onPress={handlePasswordVisibility}>
@@ -153,11 +174,15 @@ export default function Login({ navigation }) {
                   )}
                 </TouchableOpacity>
               </View>
+
+              {/* "Forgot Password?" link */}
               <TouchableOpacity style={loginAndSignUpStyle.forgotPassword}>
                 <Text style={loginAndSignUpStyle.forgotPasswordText}>
                   Forgot Password?
                 </Text>
               </TouchableOpacity>
+
+              {/* "Remember Me" checkbox */}
               <View style={loginAndSignUpStyle.rememberMe}>
                 <TouchableOpacity
                   style={loginAndSignUpStyle.checkbox}
@@ -166,6 +191,8 @@ export default function Login({ navigation }) {
                   Remember Me
                 </Text>
               </View>
+
+              {/* Login button */}
               <TouchableOpacity
                 style={loginAndSignUpStyle.loginButton}
                 onPress={handleSubmit}
@@ -174,10 +201,13 @@ export default function Login({ navigation }) {
                   Login Now
                 </Text>
               </TouchableOpacity>
+
+              {/* Display a custom toast message if there is one */}
               {message !== "" && (
                 <CustomToast message={message} type={messageType} />
               )}
 
+              {/* "New user? Sign up" link */}
               <TouchableOpacity
                 style={loginAndSignUpStyle.newUser}
                 onPress={() => navigation.navigate("SignUp")}
@@ -189,7 +219,6 @@ export default function Login({ navigation }) {
             </View>
           </ImageBackground>
         </View>
-        {/* </LinearGradient> */}
       </ScrollView>
     </TouchableWithoutFeedback>
   );

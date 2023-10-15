@@ -12,26 +12,37 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../constant/theme";
 import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-//import axios
+// Import axios for making HTTP requests
 import axios from "axios";
 
-//import AsyncStorage
+// Import AsyncStorage for storing data locally
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-//import credentials context
+// Import the CredentialsContext for user authentication
 import { CredentialsContext } from "../context/CredentialsContext";
 
-//import Components
+// Import CustomToast for displaying messages to the user
 import CustomToast from "../components/CustomToast";
 
-//import Validations
+// Import ValidationUtils for form validation
 import * as ValidationUtils from "../validations/Validation";
+
+/**
+ * States for storing user input
+ * and displaying messages to the user
+ *
+ * password and conformPassword visibility toggles
+ * get user information and store them in the context
+ *
+ * data picker
+ *
+ * handle user registration
+ */
 
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
@@ -42,27 +53,34 @@ export default function SignUp({ navigation }) {
   const [conformPassword, setConformPassword] = useState("");
   const [dob, setDob] = useState("");
 
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
+  const [message, setMessage] = useState(""); // Message to display to the user
+  const [messageType, setMessageType] = useState(""); // Type of message (e.g., error, success)
 
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Toggle for showing/hiding password
   const [isConformPasswordVisible, setIsConformPasswordVisible] =
-    useState(false);
+    useState(false); // Toggle for showing/hiding confirm password
 
+  // Get user credentials and set them in the context
   const { storedCredentials, setStoredCredentials } =
     useContext(CredentialsContext);
 
+  // Toggle visibility of password field
   const handlePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
+  // Toggle visibility of confirm password field
   const handleConformPasswordVisibility = () => {
     setIsConformPasswordVisible(!isConformPasswordVisible);
   };
 
+  // Toggle the date picker
   const [showPicker, setShowPicker] = useState(false);
+
+  // Selected date for the date of birth
   const [selectedDate, setSelectedDate] = useState(new Date()); // Initial date
 
+  // Handle changes in the date picker
   const onChange = (event, selectedDate) => {
     if (event.type === "set") {
       // 'set' event occurs when the user selects a date
@@ -77,6 +95,7 @@ export default function SignUp({ navigation }) {
     }
   };
 
+  // Handle user registration
   const handleSubmit = async () => {
     // Perform validation using the imported functions
     const formData = {
@@ -91,10 +110,12 @@ export default function SignUp({ navigation }) {
     const validationResult = ValidationUtils.validateSignUp(formData);
 
     if (validationResult.message) {
+      // Display an error message to the user
       setMessage(validationResult.message);
       setMessageType(validationResult.messageType);
     } else {
       try {
+        // Send a POST request to the server for user registration
         const response = await axios.post(
           "http://192.168.8.131:3003/api/customers/signUp",
           {
@@ -107,12 +128,15 @@ export default function SignUp({ navigation }) {
           }
         );
         if (response.data.success) {
+          // Registration was successful
           const customer = response.data;
           console.log(customer);
           console.log("Sign up successful");
-          // navigation.navigate("Home", { customer: customer });
+
+          // Store user data locally and set them in the context
           persistSignUp(customer);
         } else {
+          // Registration failed
           console.log(response);
         }
       } catch (error) {
@@ -121,7 +145,7 @@ export default function SignUp({ navigation }) {
     }
   };
 
-  //signup persist
+  // Store user data locally and set them in the context
   const persistSignUp = (customer) => {
     AsyncStorage.setItem("customerKey", JSON.stringify(customer))
       .then(() => {
@@ -146,7 +170,7 @@ export default function SignUp({ navigation }) {
             <View style={loginAndSignUpStyle.formContent}>
               <Text style={loginAndSignUpStyle.title}>Sign Up</Text>
 
-              {/* NIC field is here */}
+              {/* NIC input field */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
@@ -157,7 +181,7 @@ export default function SignUp({ navigation }) {
                 />
               </View>
 
-              {/* First name  field is here */}
+              {/* First Name input field */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
@@ -168,7 +192,7 @@ export default function SignUp({ navigation }) {
                 />
               </View>
 
-              {/* last name field is here */}
+              {/* Last Name input field */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
@@ -179,7 +203,7 @@ export default function SignUp({ navigation }) {
                 />
               </View>
 
-              {/* bod field is here */}
+              {/* Date of Birth input field with date picker */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
@@ -207,7 +231,7 @@ export default function SignUp({ navigation }) {
                 </View>
               </View>
 
-              {/* Email field is here */}
+              {/* Email input field */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
@@ -218,7 +242,7 @@ export default function SignUp({ navigation }) {
                 />
               </View>
 
-              {/*  password field is here */}
+              {/* Password input field with show/hide password option */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
@@ -238,14 +262,12 @@ export default function SignUp({ navigation }) {
                 </TouchableOpacity>
               </View>
 
-              {/* Conform password field is here */}
-
+              {/* Confirm Password input field with show/hide password option */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
-                  placeholder="Conform Password"
+                  placeholder="Confirm Password"
                   placeholderTextColor={COLORS.darkGray}
-                  // editable={!!values.password}
                   onChangeText={(text) => setConformPassword(text)}
                   secureTextEntry={!isConformPasswordVisible}
                 />
@@ -260,23 +282,25 @@ export default function SignUp({ navigation }) {
                 </TouchableOpacity>
               </View>
 
+              {/* Sign Up button */}
               <TouchableOpacity
                 style={loginAndSignUpStyle.loginButton}
                 onPress={handleSubmit}
               >
                 <Text style={loginAndSignUpStyle.loginButtonText}>
-                  SingUp Now
+                  SignUp Now
                 </Text>
               </TouchableOpacity>
+
+              {/* Already have an account? Login button */}
               <TouchableOpacity
                 style={loginAndSignUpStyle.newUser}
                 onPress={() => navigation.navigate("Login")}
               >
-                {/* custom toast message  */}
+                {/* Display a custom toast message if there is one */}
                 {message !== "" && (
                   <CustomToast message={message} type={messageType} />
                 )}
-                {/* custom toast message  */}
 
                 <Text style={loginAndSignUpStyle.forgotPasswordText}>
                   Already have an account? Login
@@ -286,7 +310,6 @@ export default function SignUp({ navigation }) {
           </ImageBackground>
         </View>
       </ScrollView>
-      {/* </LinearGradient> */}
     </TouchableWithoutFeedback>
   );
 }

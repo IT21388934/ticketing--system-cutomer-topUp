@@ -41,6 +41,32 @@ const commonStyles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
   },
+
+  rowContainer_SpaceBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  rowContainer_flexStart: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignContent: "center",
+    alignItems: "center",
+  },
+  subtitles: {
+    fontWeight: "bold",
+    marginRight: 10,
+    fontSize: 18,
+  },
+
+  normalText: {
+    fontSize: 16,
+  },
+
+  containerHrCentered: {
+    flex: 1,
+    // justifyContent: "center",r
+    alignItems: "center",
+  },
 });
 
 export default commonStyles;

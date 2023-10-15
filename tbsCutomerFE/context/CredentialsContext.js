@@ -1,4 +1,4 @@
-/* Create react context to store customer data that retrieved 
+/* Create react context hook to store customer data that retrieved 
 from login and signup. This context is used to get logged in customer data.
 */
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   ImageBackground,
   StyleSheet,
@@ -17,8 +17,14 @@ import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import CustomToast from "../components/CustomToast";
 
-//API Clients
+//import axios
 import axios from "axios";
+
+//import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+//import credentials context
+import { CredentialsContext } from "../context/CredentialsContext";
 
 export default function Login({ navigation }) {
   // const [values, setValues] = useState({ nic: "", password: "" });
@@ -26,53 +32,16 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState("");
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
-  // const showToast = (message) => {
-  //   ToastAndroid.show(message, ToastAndroid.SHORT);
-  // };
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
 
   const handlePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
-
-  // const handleSubmit = () => {
-  //   console.log("Form Submitted!");
-  //   const data = {
-  //     nic: nic,
-  //     password: password,
-  //   };
-  //   const url = "http://localhost:3000/api/customers/login";
-  //   axios
-  //     .post(url, data)
-  //     .then((res) => {
-  //       const result = res.data;
-  //       const { status, message, data } = result;
-
-  //       if (status !== "SUCCESS") {
-  //         setMessage(message);
-  //         setMessageType("error");
-
-  //         return;
-  //       } else {
-  //         navigation.navigate("Home");
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log(err.JSON);
-  //       setMessage(
-  //         "An error occurred. Please check your network and try again later."
-  //       );
-  //       setMessageType("error");
-  //     });
-  //   // const data = {
-  //   //   nic: nic,
-  //   //   password: password,
-  //   // };
-  //   // console.log(data);
-  // };
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
@@ -88,10 +57,13 @@ export default function Login({ navigation }) {
         console.log(message);
         // Login successful
         setMessage("Login successful");
+        setMessageType("success");
         console.log(response.data.customer);
-        const customer = response.data.customer;
+        const customer = response.data;
+        console.log(customer);
+        persistLogin(customer);
 
-        navigation.navigate("Home", { customer: customer });
+        // navigation.navigate("Home", { customer: customer });
       } else {
         // Login failed, display the error message
         setMessage("Invalid password or NIC");
@@ -107,6 +79,20 @@ export default function Login({ navigation }) {
         setMessage("Login failed");
       }
     }
+  };
+
+  //persist login
+  const persistLogin = (customer) => {
+    AsyncStorage.setItem("customerKey", JSON.stringify(customer))
+      .then(() => {
+        console.log("Login credentials stored");
+        setStoredCredentials(customer);
+      })
+      .catch((error) => {
+        console.log(error);
+        setMessage("Persisting login failed");
+        setMessageType("error");
+      });
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

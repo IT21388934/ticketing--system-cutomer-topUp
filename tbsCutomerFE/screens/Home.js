@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   ScrollView,
@@ -21,14 +21,23 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 //import styles
 import commonStyles from "../styles/commonStyles";
 
-const Home = ({ navigation, route }) => {
-  const { customer } = route.params;
+//import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-  console.log(customer._id);
+//import CredentialsContext
+import { CredentialsContext } from "../context/CredentialsContext";
+
+const Home = ({ navigation }) => {
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
+  const { customer } = storedCredentials;
+
+  console.log(customer);
 
   const [data, setData] = useState([]);
 
@@ -62,8 +71,17 @@ const Home = ({ navigation, route }) => {
       await fetchData(); // Fetch data when the component mounts
     };
     fetchDataOnMount();
-    console.log(customer._id);
+    console.log(customer);
   }, []);
+
+  const clearLogin = () => {
+    AsyncStorage.removeItem("customerKey")
+      .then(() => {
+        setStoredCredentials("");
+        console.log("Logout");
+      })
+      .catch((error) => console.log(error));
+  };
 
   return (
     <>
@@ -75,7 +93,13 @@ const Home = ({ navigation, route }) => {
         />
       </View>
       <ScrollView style={styles.container}>
-        <Text style={commonStyles.headerText}>Welcome, {data.firstName}</Text>
+        <View style={commonStyles.rowContainer_SpaceBetween}>
+          <Text style={commonStyles.headerText}>Welcome, {data.firstName}</Text>
+          <TouchableOpacity onPress={clearLogin} style={{ marginRight: 20 }}>
+            <AntDesign name="logout" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+
         {/* Wallet Balance */}
         <View style={styles.balanceContainer}>
           <TouchableOpacity
@@ -108,7 +132,12 @@ const Home = ({ navigation, route }) => {
 
             <Text style={styles.buttonText}>Home</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            // onPress={() =>
+            //   // navigation.navigate("ProfileScreen", { customer: data })
+            // }
+          >
             <View style={styles.button}>
               <FontAwesome name="user-o" size={25} color="white" />
             </View>

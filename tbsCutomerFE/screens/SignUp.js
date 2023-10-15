@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   ImageBackground,
   StyleSheet,
@@ -18,7 +18,14 @@ import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
+//import axios
 import axios from "axios";
+
+//import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+//import credentials context
+import { CredentialsContext } from "../context/CredentialsContext";
 
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState("");
@@ -30,51 +37,18 @@ export default function SignUp({ navigation }) {
   const [dob, setDob] = useState("");
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConformPasswordVisible, setIsConformPasswordVisible] =
+    useState(false);
+
+  const { storedCredentials, setStoredCredentials } =
+    useContext(CredentialsContext);
 
   const handlePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const [isConformPasswordVisible, setIsConformPasswordVisible] =
-    useState(false);
-
   const handleConformPasswordVisibility = () => {
     setIsConformPasswordVisible(!isConformPasswordVisible);
-  };
-
-  // const handleSubmit = async () => {
-  //   console.log("Form Submitted!");
-  //   console.log(nic);
-  //   console.log(firstName);
-  //   console.log(lastName);
-  //   console.log(dob);
-  //   console.log(email);
-  //   console.log(password);
-  //   console.log(conformPassword);
-  // };
-  const handleSubmit = async () => {
-    try {
-      const response = await axios.post(
-        "http://192.168.8.131:3003/api/customers/signUp",
-        {
-          firstName,
-          lastName,
-          nic,
-          dob,
-          email,
-          password,
-        }
-      );
-      if (response.data.success) {
-        const customer = response.data.customer;
-        console.log(response);
-        navigation.navigate("Home", { customer: customer });
-      } else {
-        console.log(response);
-      }
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const [showPicker, setShowPicker] = useState(false);
@@ -92,6 +66,47 @@ export default function SignUp({ navigation }) {
       // 'dismissed' event occurs when the user cancels the date picker
       setShowPicker(false); // Close the date picker without changes
     }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        "http://192.168.8.131:3003/api/customers/signUp",
+        {
+          firstName,
+          lastName,
+          nic,
+          dob,
+          email,
+          password,
+        }
+      );
+      if (response.data.success) {
+        const customer = response.data;
+        console.log(customer);
+        console.log("Sign up successful");
+        // navigation.navigate("Home", { customer: customer });
+        persistSignUp(customer);
+      } else {
+        console.log(response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //signup persist
+  const persistSignUp = (customer) => {
+    AsyncStorage.setItem("customerKey", JSON.stringify(customer))
+      .then(() => {
+        console.log("Login credentials stored");
+        setStoredCredentials(customer);
+      })
+      .catch((error) => {
+        console.log(error);
+        setMessage("Persisting login failed");
+        setMessageType("error");
+      });
   };
 
   return (

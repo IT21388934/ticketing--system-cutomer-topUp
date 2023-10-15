@@ -1,23 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 
 //RootStack
 import RootStack from "./navigators/RootStack";
 
+//import AsyncStorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+//import AppLoading
+import AppLoading from "expo-app-loading";
+
+//import credentialsContext
+import { CredentialsContext } from "./context/CredentialsContext";
+
 export default function App() {
+  const [appReady, setAppReady] = useState(false);
+  const [storedCredentials, setStoredCredentials] = useState("");
+
+  const checkLogin = () => {
+    AsyncStorage.getItem("customerKey")
+      .then((result) => {
+        if (result !== null) {
+          setStoredCredentials(JSON.parse(result));
+        } else {
+          setStoredCredentials(null);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  if (!appReady) {
+    return (
+      <AppLoading
+        startAsync={checkLogin}
+        onFinish={() => setAppReady(true)}
+        onError={console.warn}
+      />
+    );
+  }
+
   return (
     <>
-      <RootStack />
-      {/* <StatusBar style="auto" /> */}
+      <CredentialsContext.Provider
+        value={{ storedCredentials, setStoredCredentials }}
+      >
+        <RootStack />
+        {/* <StatusBar style="auto" /> */}
+      </CredentialsContext.Provider>
     </>
   );
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });

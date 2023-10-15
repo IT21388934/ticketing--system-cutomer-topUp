@@ -21,15 +21,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
 
 export default function SignUp({ navigation }) {
-  const [values, setValues] = useState({
-    email: "",
-    password: "",
-    lastName: "",
-    firstName: "",
-    nic: "",
-    conformPassword: "",
-    dob: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [nic, setNic] = useState("");
+  const [conformPassword, setConformPassword] = useState("");
+  const [dob, setDob] = useState("");
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -44,53 +42,55 @@ export default function SignUp({ navigation }) {
     setIsConformPasswordVisible(!isConformPasswordVisible);
   };
 
-  async function handleSubmit() {
-    var data = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      dob: values.dob,
-      nic: values.nic,
-      email: values.email,
-      password: values.password,
-    };
-
-    await axios({
-      url: "http://192.168.8.131:3003/api/customers/signUp",
-      method: "POST",
-      data: data,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then(function (response) {
-        // handle success
-        const { success } = response.data;
-        if (success) {
-          console.log(response.data.customer);
-          const { customer } = response.data;
-          navigation.navigate("Home", { customer: customer });
-        } else {
-          console.log(response.data);
-          alert(response.data.message);
+  // const handleSubmit = async () => {
+  //   console.log("Form Submitted!");
+  //   console.log(nic);
+  //   console.log(firstName);
+  //   console.log(lastName);
+  //   console.log(dob);
+  //   console.log(email);
+  //   console.log(password);
+  //   console.log(conformPassword);
+  // };
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        "http://192.168.8.131:3003/api/customers/signUp",
+        {
+          firstName,
+          lastName,
+          nic,
+          dob,
+          email,
+          password,
         }
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-        console.log("async error");
-      });
-  }
+      );
+      if (response.data.success) {
+        const customer = response.data.customer;
+        console.log(response);
+        navigation.navigate("Home", { customer: customer });
+      } else {
+        console.log(response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Initial date
 
   const onChange = (event, selectedDate) => {
-    setShowPicker(false);
-    if (selectedDate) {
-      const formattedDate = selectedDate.toLocaleDateString();
-      setValues({ ...values, dob: formattedDate });
+    if (event.type === "set") {
+      // 'set' event occurs when the user selects a date
+      setShowPicker(false); // Close the date picker
+      if (selectedDate) {
+        setSelectedDate(selectedDate); // Update the selected date
+        setDob(selectedDate);
+      }
+    } else if (event.type === "dismissed") {
+      // 'dismissed' event occurs when the user cancels the date picker
+      setShowPicker(false); // Close the date picker without changes
     }
   };
 
@@ -117,8 +117,7 @@ export default function SignUp({ navigation }) {
                   style={loginAndSignUpStyle.input}
                   placeholder="NIC"
                   placeholderTextColor={COLORS.darkGray}
-                  onChangeText={(text) => setValues({ ...values, nic: text })}
-                  value={values.nic}
+                  onChangeText={(text) => setNic(text)}
                   keyboardType="default"
                 />
               </View>
@@ -129,10 +128,7 @@ export default function SignUp({ navigation }) {
                   style={loginAndSignUpStyle.input}
                   placeholder="First Name"
                   placeholderTextColor={COLORS.darkGray}
-                  onChangeText={(text) =>
-                    setValues({ ...values, firstName: text })
-                  }
-                  value={values.firstName}
+                  onChangeText={(text) => setFirstName(text)}
                   keyboardType="default"
                 />
               </View>
@@ -143,10 +139,7 @@ export default function SignUp({ navigation }) {
                   style={loginAndSignUpStyle.input}
                   placeholder="Last Name"
                   placeholderTextColor={COLORS.darkGray}
-                  onChangeText={(text) =>
-                    setValues({ ...values, lastName: text })
-                  }
-                  value={values.lastName}
+                  onChangeText={(text) => setLastName(text)}
                   keyboardType="default"
                 />
               </View>
@@ -157,11 +150,10 @@ export default function SignUp({ navigation }) {
                   style={loginAndSignUpStyle.input}
                   placeholder="Date of Birth"
                   placeholderTextColor={COLORS.darkGray}
-                  value={values.dob || ""}
+                  value={dob ? dob.toISOString().split("T")[0] : ""} // Convert date object to string
                   keyboardType="default"
                   editable={false}
                 />
-
                 <View>
                   <FontAwesome
                     name="calendar"
@@ -172,8 +164,8 @@ export default function SignUp({ navigation }) {
                   />
                   {showPicker && (
                     <DateTimePicker
-                      value={date}
-                      mode="date" // or "time" for time picker
+                      value={dob || new Date()} // Set the value prop to selectedDate or a new Date object
+                      mode="date"
                       onChange={onChange}
                     />
                   )}
@@ -186,8 +178,7 @@ export default function SignUp({ navigation }) {
                   style={loginAndSignUpStyle.input}
                   placeholder="Email Address"
                   placeholderTextColor={COLORS.darkGray}
-                  onChangeText={(text) => setValues({ ...values, email: text })}
-                  value={values.email}
+                  onChangeText={(text) => setEmail(text)}
                   keyboardType="email-address"
                 />
               </View>
@@ -198,14 +189,11 @@ export default function SignUp({ navigation }) {
                   style={loginAndSignUpStyle.input}
                   placeholder="Password"
                   placeholderTextColor={COLORS.darkGray}
-                  onChangeText={(text) =>
-                    setValues({ ...values, password: text })
-                  }
-                  value={values.password}
+                  onChangeText={(text) => setPassword(text)}
                   secureTextEntry={!isPasswordVisible}
                 />
                 <TouchableOpacity onPress={handlePasswordVisibility}>
-                  {values.password !== "" && (
+                  {password !== "" && (
                     <FontAwesome
                       name={isPasswordVisible ? "eye" : "eye-slash"}
                       size={24}
@@ -223,14 +211,11 @@ export default function SignUp({ navigation }) {
                   placeholder="Conform Password"
                   placeholderTextColor={COLORS.darkGray}
                   // editable={!!values.password}
-                  onChangeText={(text) =>
-                    setValues({ ...values, conformPassword: text })
-                  }
-                  value={values.conformPassword}
+                  onChangeText={(text) => setConformPassword(text)}
                   secureTextEntry={!isConformPasswordVisible}
                 />
                 <TouchableOpacity onPress={handleConformPasswordVisibility}>
-                  {values.conformPassword !== "" && (
+                  {conformPassword !== "" && (
                     <FontAwesome
                       name={isPasswordVisible ? "eye" : "eye-slash"}
                       size={24}

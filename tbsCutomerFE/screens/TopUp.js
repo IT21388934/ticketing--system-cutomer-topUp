@@ -9,77 +9,67 @@ import {
   TouchableOpacity,
   Modal,
 } from "react-native";
-
-//import axios
 import axios from "axios";
-
-//import  styles
+import Header from "../components/Header";
+import CustomToast from "../components/CustomToast";
+import { COLORS } from "../constant/theme";
+import { FontAwesome } from "@expo/vector-icons";
+import { BASE_URL } from "../constant/config";
 import commonStyles from "../styles/commonStyles";
 import topUpScreenStyles from "../styles/topUpScreenStyles";
 
-//import toast
-import CustomToast from "../components/CustomToast";
-
-//import theme
-import { COLORS } from "../constant/theme";
-
-//import fonts
-import { FontAwesome } from "@expo/vector-icons";
-
 /**
- * TopUp screen
- * state for store topup amount and balance of the customer
- * state for store message and message type
- *  state for store credit card details
- * state for store show credit card popup
+ * extract customer data from route params
+ * states to manage various inputs and messages
+ * function to toggle the credit card input popup
+ * function to close the credit card input popup
+ * function to handle the top-up process
+ * function to handle the payment process
+ * function to handle changes in the Expiry input field
+ * function to handle changes in the Credit Card Number input field
  *
- * handle popup
- * handle close popup
+ * implement UI for the top-up screen
  *
- * handle topup function
- *
- * TopUp UI
- *
- * @param {*} navigation
  * @param {*} param0
  * @returns
  */
 
 export default function TopUp({ navigation, route }) {
-  //set customer object
+  // Extract customer data from route params
   const { customer } = route.params;
 
-  //set constants
+  // States to manage various inputs and messages
   const [topupAmount, setTopupAmount] = useState("");
   const [balance, setBalance] = useState(customer.balance);
-
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
-
   const [showCreditCardPopup, setShowCreditCardPopup] = useState(false);
   const [creditCardNumber, setCreditCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvc, setCVC] = useState("");
 
+  // Function to toggle the credit card input popup
   const toggleCreditCardPopup = () => {
-    if (topupAmount <= 0 || topupAmount == "") {
+    if (topupAmount <= 0 || topupAmount === "") {
       alert("Please enter a valid top-up amount");
     } else {
       setShowCreditCardPopup(!showCreditCardPopup);
     }
   };
 
+  // Function to close the credit card input popup
   const handleClosePopup = () => {
     setShowCreditCardPopup(false);
   };
 
+  // Function to handle the top-up process
   async function handleTopup() {
     try {
       var data = {
         increment: topupAmount,
       };
       const response = await axios.post(
-        `http://192.168.8.131:3003/api/customers/topUp/${customer._id}`,
+        `${BASE_URL}/api/customers/topUp/${customer._id}`,
         data
       );
       const result = response.data;
@@ -98,8 +88,9 @@ export default function TopUp({ navigation, route }) {
     }
   }
 
+  // Function to handle the payment process
   const handleProceed = async () => {
-    if (creditCardNumber.length == 16) {
+    if (creditCardNumber.length === 18) {
       try {
         await handleTopup();
       } catch (error) {
@@ -110,16 +101,40 @@ export default function TopUp({ navigation, route }) {
     }
   };
 
+  // Function to handle changes in the Expiry input field
+  const handleExpiryChange = (text) => {
+    // Ensure only numbers and "/" are allowed
+    if (/^[0-9/]*$/.test(text) && text.length <= 5) {
+      // Automatically insert "/" after the second character
+      if (text.length === 2 && text.charAt(1) !== "/") {
+        text = text.slice(0, 2) + "/" + text.slice(2);
+      }
+      setExpiry(text);
+    }
+  };
+
+  // Function to handle changes in the Credit Card Number input field
+  const handleCreditCardNumberChange = (text) => {
+    // Ensure only numbers and " " are allowed
+    if (/^[0-9 ]*$/.test(text) && text.length <= 18) {
+      // Automatically insert " " after the 4th, 8th, and 12th characters
+      if (text.length === 4 && text.charAt(3) !== " ") {
+        text = text.slice(0, 4) + " " + text.slice(4);
+      } else if (text.length === 9 && text.charAt(8) !== " ") {
+        text = text.slice(0, 9) + " " + text.slice(9);
+      } else if (text.length === 14 && text.charAt(13) !== " ") {
+        text = text.slice(0, 13) + " " + text.slice(13);
+      }
+      setCreditCardNumber(text);
+    }
+  };
+
   return (
     <>
-      <View style={commonStyles.header}>
-        <Image
-          source={require("../assets/images/logo1.png")}
-          style={commonStyles.logo}
-        />
-      </View>
+      <Header />
+
       <View style={topUpScreenStyles.container}>
-        <Text style={commonStyles.headerText}>Top Up </Text>
+        <Text style={commonStyles.headerText}>Top Up</Text>
         <View style={topUpScreenStyles.topUpContainer}>
           <Text style={topUpScreenStyles.balanceText}>
             Current Balance: Rs: {balance}
@@ -136,7 +151,7 @@ export default function TopUp({ navigation, route }) {
             style={commonStyles.btn}
             onPress={toggleCreditCardPopup}
           >
-            <Text style={commonStyles.btnText}> TopUp </Text>
+            <Text style={commonStyles.btnText}>Top Up</Text>
           </TouchableOpacity>
           <CustomToast message={message} type={messageType} />
 
@@ -160,7 +175,7 @@ export default function TopUp({ navigation, route }) {
                       style={topUpScreenStyles.input}
                       placeholder="Card Number"
                       value={creditCardNumber}
-                      onChangeText={(text) => setCreditCardNumber(text)}
+                      onChangeText={handleCreditCardNumberChange}
                       keyboardType="numeric"
                     />
                   </View>
@@ -172,8 +187,9 @@ export default function TopUp({ navigation, route }) {
                       style={topUpScreenStyles.input}
                       placeholder="MM/YY"
                       value={expiry}
-                      onChangeText={(text) => setExpiry(text)}
+                      onChangeText={handleExpiryChange}
                       keyboardType="numeric"
+                      maxLength={5}
                     />
                   </View>
                   <View style={topUpScreenStyles.cardInput}>
@@ -184,6 +200,7 @@ export default function TopUp({ navigation, route }) {
                       value={cvc}
                       onChangeText={(text) => setCVC(text)}
                       keyboardType="numeric"
+                      maxLength={3}
                     />
                   </View>
                 </View>

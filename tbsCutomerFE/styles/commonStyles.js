@@ -67,6 +67,11 @@ const commonStyles = StyleSheet.create({
     // justifyContent: "center",r
     alignItems: "center",
   },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 export default commonStyles;

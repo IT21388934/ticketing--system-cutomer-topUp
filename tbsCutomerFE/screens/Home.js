@@ -8,10 +8,15 @@ import {
   StyleSheet,
 } from "react-native";
 
+//import axios for making HTTP requests
 import axios from "axios";
 
-//import screens
+//import config
+import { BASE_URL } from "../constant/config";
+
+//import screens and components
 import JourneyCard from "../components/JourneyCard";
+import Header from "../components/Header";
 
 //import theme
 import { COLORS } from "../constant/theme";
@@ -33,14 +38,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //import CredentialsContext
 import { CredentialsContext } from "../context/CredentialsContext";
 
-/*
-store customer data retrieved from the login and signup screens
-in the AsyncStorage and retrieve it from the AsyncStorage
+/**
+ * Declare constants for storing customer data and setting customer data
+ * Declare state for storing customer data
+ * Declare function for fetching data from the database
+ * Declare function for logout
+ *
+ * Implement UI for the home screen
+ *
+ */
 
-useEffect is used to fetch data from the database when the component mounts
-
-implement UI for the home screen
-*/
 const Home = ({ navigation }) => {
   //Constants
   const { storedCredentials, setStoredCredentials } =
@@ -53,7 +60,7 @@ const Home = ({ navigation }) => {
   async function fetchData() {
     try {
       const response = await axios({
-        url: "http://192.168.8.131:3003/api/customers/" + customer._id,
+        url: `${BASE_URL}/api/customers/` + customer._id,
         method: "GET",
         header: {
           "Content-Type": "application/json",
@@ -100,21 +107,16 @@ const Home = ({ navigation }) => {
   return (
     <>
       {/* Header */}
-      <View style={commonStyles.header}>
-        <Image
-          source={require("../assets/images/logo1.png")}
-          style={commonStyles.logo}
-        />
-      </View>
+      <Header />
+
       <ScrollView style={homeStyle.container}>
+        {/* Wallet Balance */}
         <View style={commonStyles.rowContainer_SpaceBetween}>
           <Text style={commonStyles.headerText}>Welcome, {data.firstName}</Text>
           <TouchableOpacity onPress={clearLogin} style={{ marginRight: 20 }}>
             <AntDesign name="logout" size={24} color="black" />
           </TouchableOpacity>
         </View>
-
-        {/* Wallet Balance */}
         <View style={homeStyle.balanceContainer}>
           <TouchableOpacity
             style={homeStyle.topUpBtn}

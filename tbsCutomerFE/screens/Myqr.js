@@ -1,46 +1,34 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
-import CustomerQRCode from "../components/CustomeQRCode";
 
-//import styles
+//import sceens and components
+import CustomerQRCode from "../components/CustomeQRCode";
+import Header from "../components/Header";
+
+//import styles and themw
 import commonStyles from "../styles/commonStyles";
 import { COLORS } from "../constant/theme";
 
+/**
+ * extract customer data from route params
+ * implement UI for the My QR screen
+ *
+ * @param {*} param0
+ * @returns
+ */
 export default function Myqr({ navigation, route }) {
   const { customer } = route.params;
   console.log(customer);
 
-  const customerID = "12555";
+  const customerID = customer._id;
 
   return (
     <>
-      <View style={commonStyles.header}>
-        <Image
-          source={require("../assets/images/logo1.png")}
-          style={commonStyles.logo}
-        />
-      </View>
-      <View style={styles.container}>
-        <Text style={styles.headerText}>Customer QR Code</Text>
+      <Header />
+      <View style={commonStyles.centeredContainer}>
+        <Text style={commonStyles.headerText}>My QR Code</Text>
         <CustomerQRCode customerID={customerID} />
       </View>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: COLORS.secondaryBlue,
-  },
-});

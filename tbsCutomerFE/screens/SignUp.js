@@ -20,6 +20,9 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 // Import axios for making HTTP requests
 import axios from "axios";
 
+// Import config
+import { BASE_URL } from "../constant/config";
+
 // Import AsyncStorage for storing data locally
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -40,8 +43,11 @@ import * as ValidationUtils from "../validations/Validation";
  * get user information and store them in the context
  *
  * data picker
- *
+ * handle changes in the date picker
  * handle user registration
+ *
+ * @param {object} navigation - React Navigation object for screen navigation
+ * @returns {JSX.Element}
  */
 
 export default function SignUp({ navigation }) {
@@ -116,17 +122,14 @@ export default function SignUp({ navigation }) {
     } else {
       try {
         // Send a POST request to the server for user registration
-        const response = await axios.post(
-          "http://192.168.8.131:3003/api/customers/signUp",
-          {
-            firstName,
-            lastName,
-            nic,
-            dob,
-            email,
-            password,
-          }
-        );
+        const response = await axios.post(`${BASE_URL}/api/customers/signUp`, {
+          firstName,
+          lastName,
+          nic,
+          dob,
+          email,
+          password,
+        });
         if (response.data.success) {
           // Registration was successful
           const customer = response.data;

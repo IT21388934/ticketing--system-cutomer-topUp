@@ -21,6 +21,9 @@ import CustomToast from "../components/CustomToast";
 // Import axios for making HTTP requests
 import axios from "axios";
 
+//import config
+import { BASE_URL } from "../constant/config";
+
 // Import AsyncStorage for storing data locally
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -76,13 +79,10 @@ export default function Login({ navigation }) {
     } else {
       try {
         // Send a POST request to the server for user login
-        const response = await axios.post(
-          "http://192.168.8.131:3003/api/customers/login",
-          {
-            nic,
-            password,
-          }
-        );
+        const response = await axios.post(`${BASE_URL}/api/customers/login`, {
+          nic,
+          password,
+        });
 
         if (response.data.success) {
           const { data, success, message } = response.data;

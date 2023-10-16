@@ -12,8 +12,11 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
+
+//import theme styles and images
 import { COLORS } from "../constant/theme";
 import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
+import { loginScreenImage } from "../constant/images";
 import { FontAwesome } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
@@ -167,7 +170,7 @@ export default function SignUp({ navigation }) {
       <ScrollView contentContainerStyle={loginAndSignUpStyle.scrollView}>
         <View style={loginAndSignUpStyle.container}>
           <ImageBackground
-            source={require("../assets/images/loginbg.png")}
+            source={loginScreenImage}
             style={loginAndSignUpStyle.bgImage}
           >
             <View style={loginAndSignUpStyle.formContent}>

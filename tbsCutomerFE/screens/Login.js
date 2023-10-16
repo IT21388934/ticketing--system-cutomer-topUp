@@ -12,9 +12,12 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+
+//import theme styles and images
 import { COLORS } from "../constant/theme";
 import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
+import { loginScreenImage } from "../constant/images";
+
 import { FontAwesome } from "@expo/vector-icons";
 import CustomToast from "../components/CustomToast";
 
@@ -138,7 +141,7 @@ export default function Login({ navigation }) {
       <ScrollView contentContainerStyle={loginAndSignUpStyle.scrollView}>
         <View style={loginAndSignUpStyle.container}>
           <ImageBackground
-            source={require("../assets/images/loginbg.png")}
+            source={loginScreenImage}
             style={loginAndSignUpStyle.bgImage}
           >
             <View style={loginAndSignUpStyle.loginFormContent}>

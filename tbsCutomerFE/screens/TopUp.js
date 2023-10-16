@@ -90,7 +90,7 @@ export default function TopUp({ navigation, route }) {
 
   // Function to handle the payment process
   const handleProceed = async () => {
-    if (creditCardNumber.length === 18) {
+    if (creditCardNumber.length === 19) {
       try {
         await handleTopup();
       } catch (error) {
@@ -116,14 +116,14 @@ export default function TopUp({ navigation, route }) {
   // Function to handle changes in the Credit Card Number input field
   const handleCreditCardNumberChange = (text) => {
     // Ensure only numbers and " " are allowed
-    if (/^[0-9 ]*$/.test(text) && text.length <= 18) {
+    if (/^[0-9 ]*$/.test(text) && text.length <= 19) {
       // Automatically insert " " after the 4th, 8th, and 12th characters
       if (text.length === 4 && text.charAt(3) !== " ") {
         text = text.slice(0, 4) + " " + text.slice(4);
       } else if (text.length === 9 && text.charAt(8) !== " ") {
         text = text.slice(0, 9) + " " + text.slice(9);
       } else if (text.length === 14 && text.charAt(13) !== " ") {
-        text = text.slice(0, 13) + " " + text.slice(13);
+        text = text.slice(0, 14) + " " + text.slice(14);
       }
       setCreditCardNumber(text);
     }

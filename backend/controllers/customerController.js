@@ -1,3 +1,4 @@
+// Import the required modules and models
 const Customer = require("../models/customerModel");
 const bcrypt = require("bcrypt");
 
@@ -81,7 +82,7 @@ exports.signUp = async (req, res) => {
     // Extract customer information from the request body
     const { firstName, lastName, email, password, dob, nic } = req.body;
 
-    // // Hash the password
+    // Hash the password
     let hashedPassword;
     try {
       hashedPassword = await bcrypt.hash(password, 10);
@@ -124,24 +125,20 @@ exports.signUp = async (req, res) => {
   }
 };
 
-//login
-// const Customer = require("../models/customerModel");
-// const bcrypt = require("bcryptjs");
-
 // Login a customer
 exports.login = async (req, res) => {
   try {
     // Extract email and password from the request body
     const { nic, password } = req.body;
 
-    // Find the customer with the given email
+    // Find the customer with the given NIC
     const customer = await Customer.findOne({ nic });
 
     // If the customer is not found, respond with an error message
     if (!customer) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid NIC or password",
       });
     }
 
@@ -152,11 +149,11 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid NIC or password",
       });
     }
 
-    // If the email and password are correct, respond with a success message and the customer data
+    // If the NIC and password are correct, respond with a success message and the customer data
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -172,8 +169,7 @@ exports.login = async (req, res) => {
   }
 };
 
-//topUp
-
+// Top-up a customer's balance
 exports.topUp = async (req, res) => {
   const customerId = req.params.id; // Get the customer ID from the route parameter
   const incrementAmount = parseFloat(req.body.increment); // Parse the increment value from the request body

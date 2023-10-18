@@ -1,11 +1,9 @@
-// Import the required modules and models
-const Customer = require("../models/customerModel");
+const customerRepository = require("../repositories/CustomerRepository");
 const bcrypt = require("bcrypt");
 
-// Get all customers
 exports.getAllCustomers = async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const customers = await customerRepository.getAllCustomers();
     res.status(200).json({
       status: "success",
       results: customers.length,
@@ -21,10 +19,9 @@ exports.getAllCustomers = async (req, res) => {
   }
 };
 
-// Get a single customer by ID
 exports.getCustomerById = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await customerRepository.getCustomerById(req.params.id);
     res.status(200).json({
       success: true,
       data: {
@@ -39,13 +36,12 @@ exports.getCustomerById = async (req, res) => {
   }
 };
 
-// Update an existing customer by ID
 exports.updateCustomerById = async (req, res) => {
   try {
-    const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const customer = await customerRepository.updateCustomerById(
+      req.params.id,
+      req.body
+    );
     res.status(200).json({
       success: true,
       data: {
@@ -60,10 +56,9 @@ exports.updateCustomerById = async (req, res) => {
   }
 };
 
-// Delete a customer by ID
 exports.deleteCustomerById = async (req, res) => {
   try {
-    await Customer.findByIdAndDelete(req.params.id);
+    await customerRepository.deleteCustomerById(req.params.id);
     res.status(204).json({
       success: true,
       data: null,
@@ -76,13 +71,10 @@ exports.deleteCustomerById = async (req, res) => {
   }
 };
 
-// Create a new customer registration route
 exports.signUp = async (req, res) => {
   try {
-    // Extract customer information from the request body
     const { firstName, lastName, email, password, dob, nic } = req.body;
 
-    // Hash the password
     let hashedPassword;
     try {
       hashedPassword = await bcrypt.hash(password, 10);
@@ -95,8 +87,16 @@ exports.signUp = async (req, res) => {
       return;
     }
 
-    // Create a new customer document
-    const newCustomer = new Customer({
+    const existingCustomer = await customerRepository.findCustomerByNIC(nic);
+
+    if (existingCustomer) {
+      return res.status(400).json({
+        success: false,
+        message: "Customer with the same NIC already exists",
+      });
+    }
+
+    const newCustomerData = {
       firstName,
       lastName,
       email,
@@ -104,19 +104,18 @@ exports.signUp = async (req, res) => {
       dob,
       nic,
       balance: 0,
-    });
+    };
 
-    // Save the customer to the database
-    const savedCustomer = await newCustomer.save();
+    const savedCustomer = await customerRepository.createCustomer(
+      newCustomerData
+    );
 
-    // Respond with a success message and the saved customer data
     res.status(201).json({
       success: true,
       message: "Customer registered successfully",
       customer: savedCustomer,
     });
   } catch (error) {
-    // Handle registration errors, such as duplicate emails
     res.status(400).json({
       success: false,
       message: "Registration failed",
@@ -125,16 +124,12 @@ exports.signUp = async (req, res) => {
   }
 };
 
-// Login a customer
 exports.login = async (req, res) => {
   try {
-    // Extract email and password from the request body
     const { nic, password } = req.body;
 
-    // Find the customer with the given NIC
-    const customer = await Customer.findOne({ nic });
+    const customer = await customerRepository.findCustomerByNIC(nic);
 
-    // If the customer is not found, respond with an error message
     if (!customer) {
       return res.status(401).json({
         success: false,
@@ -142,10 +137,8 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Compare the password with the hashed password in the database
     const isMatch = await bcrypt.compare(password, customer.password);
 
-    // If the password does not match, respond with an error message
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -153,14 +146,12 @@ exports.login = async (req, res) => {
       });
     }
 
-    // If the NIC and password are correct, respond with a success message and the customer data
     res.status(200).json({
       success: true,
       message: "Login successful",
       customer: customer,
     });
   } catch (error) {
-    // Handle login errors
     res.status(400).json({
       success: false,
       message: "Login failed",
@@ -169,14 +160,12 @@ exports.login = async (req, res) => {
   }
 };
 
-// Top-up a customer's balance
 exports.topUp = async (req, res) => {
-  const customerId = req.params.id; // Get the customer ID from the route parameter
-  const incrementAmount = parseFloat(req.body.increment); // Parse the increment value from the request body
+  const customerId = req.params.id;
+  const incrementAmount = parseFloat(req.body.increment);
 
   try {
-    // Find the customer by their ID
-    const customer = await Customer.findById(customerId);
+    const customer = await customerRepository.getCustomerById(customerId);
 
     if (!customer) {
       return res
@@ -184,11 +173,9 @@ exports.topUp = async (req, res) => {
         .json({ success: false, message: "Customer not found" });
     }
 
-    // Calculate the new balance
     const newBalance = customer.balance + incrementAmount;
 
-    // Update the customer's balance
-    await Customer.findByIdAndUpdate(customerId, { balance: newBalance });
+    await customerRepository.updateCustomerBalance(customerId, newBalance);
 
     return res.json({
       success: true,

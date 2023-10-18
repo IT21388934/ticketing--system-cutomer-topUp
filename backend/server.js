@@ -8,6 +8,8 @@ app.use(cors());
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
+module.exports = app;
+
 require("./config/db");
 
 // Customer routes

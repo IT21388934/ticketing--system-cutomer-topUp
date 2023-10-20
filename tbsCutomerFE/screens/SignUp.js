@@ -11,10 +11,12 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
+  Switch,
 } from "react-native";
 
 //import theme styles and images
 import { COLORS } from "../constant/theme";
+import commonStyles from "../styles/commonStyles";
 import loginAndSignUpStyle from "../styles/loginAndSignUpStyle";
 import { loginScreenImage } from "../constant/images";
 import { FontAwesome } from "@expo/vector-icons";
@@ -61,6 +63,7 @@ export default function SignUp({ navigation }) {
   const [nic, setNic] = useState("");
   const [conformPassword, setConformPassword] = useState("");
   const [dob, setDob] = useState("");
+  const [isForeignPassenger, setIsForeignPassenger] = useState(false);
 
   const [message, setMessage] = useState(""); // Message to display to the user
   const [messageType, setMessageType] = useState(""); // Type of message (e.g., error, success)
@@ -165,6 +168,10 @@ export default function SignUp({ navigation }) {
       });
   };
 
+  const togglePassengerType = () => {
+    setIsForeignPassenger(!isForeignPassenger);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView contentContainerStyle={loginAndSignUpStyle.scrollView}>
@@ -175,12 +182,31 @@ export default function SignUp({ navigation }) {
           >
             <View style={loginAndSignUpStyle.formContent}>
               <Text style={loginAndSignUpStyle.title}>Sign Up</Text>
+              {/* toggles between local and foreign passenger */}
+              {/* <Text style={styles.label}>Switch Passenger</Text> */}
+              <View style={styles.switch}>
+                <View style={commonStyles.rowContainer_SpaceBetween}>
+                  <Text style={styles.status}>
+                    {isForeignPassenger
+                      ? "Foreign Passenger"
+                      : "Local Passenger"}
+                  </Text>
+                  <Switch
+                    trackColor={{ false: COLORS.white, true: "#81b0ff" }}
+                    thumbColor={
+                      isForeignPassenger ? COLORS.secondaryBlue : COLORS.primary
+                    }
+                    onValueChange={togglePassengerType}
+                    value={isForeignPassenger}
+                  />
+                </View>
+              </View>
 
               {/* NIC input field */}
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
-                  placeholder="NIC"
+                  placeholder={isForeignPassenger ? "Passport Number" : "NIC"}
                   placeholderTextColor={COLORS.darkGray}
                   onChangeText={(text) => setNic(text)}
                   keyboardType="default"
@@ -188,6 +214,7 @@ export default function SignUp({ navigation }) {
               </View>
 
               {/* First Name input field */}
+
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
@@ -319,3 +346,18 @@ export default function SignUp({ navigation }) {
     </TouchableWithoutFeedback>
   );
 }
+
+const styles = StyleSheet.create({
+  switch: {
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: COLORS.white,
+  },
+  status: {
+    fontSize: 20,
+    color: COLORS.white,
+  },
+});

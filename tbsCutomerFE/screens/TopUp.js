@@ -166,7 +166,7 @@ export default function TopUp({ navigation, route }) {
                   style={topUpScreenStyles.closeBtn}
                   onPress={handleClosePopup}
                 >
-                  <FontAwesome name="close" size={24} color="white" />
+                  <FontAwesome name="close" size={24} color="#3865d8" />
                 </TouchableOpacity>
                 <View style={topUpScreenStyles.inputContainer}>
                   <View style={topUpScreenStyles.cardInput}>

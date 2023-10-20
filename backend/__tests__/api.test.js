@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const Customer = require("../models/customerModel"); // Import the Customer model
+
 const bcrypt = require("bcrypt");
 
 // Define beforeAll and afterAll hooks to manage the MongoDB connection.
@@ -27,44 +28,58 @@ describe("Get all customers", () => {
   it("should get all customers", async () => {
     const response = await request(app).get("/api/customers");
     expect(response.status).toBe(200);
-    // Add more assertions to check the response body, etc.
+  });
+});
+//customer sign up test
+
+describe("Customer Controller - signUp", () => {
+  it("should successfully register a new customer", async () => {
+    // Define the test customer data
+    const testCustomer = {
+      firstName: "John",
+      lastName: "Doe",
+      email: "johndoe@example.com",
+      password: "testpassword",
+      dob: "1990-01-01",
+      nic: "123456789V",
+    };
+
+    // Send a POST request to the signUp route
+    const response = await request(app)
+      .post("/api/customers/signUp")
+      .send(testCustomer);
+
+    // Assertions
+    expect(response.status).toBe(201); // Check if the response status is 201 (Created)
+    expect(response.body.success).toBe(true); // Check if the success property is true
+    expect(response.body.message).toBe("Customer registered successfully"); // Check the success message
+
+    // Check if the customer is saved in the database
+    const savedCustomer = await Customer.findOne({
+      email: testCustomer.email,
+    });
+    expect(savedCustomer).not.toBeNull();
   });
 
-  // Add more test cases for other routes and HTTP methods.
-  describe("Customer Controller - signUp", () => {
-    it("should successfully register a new customer", async () => {
-      // Define the test customer data
-      const testCustomer = {
-        firstName: "John",
-        lastName: "Doe",
-        email: "johndoe@example.com",
-        password: "testpassword",
-        dob: "1990-01-01",
-        nic: "123456789V",
-      };
+  it("should return an error if a customer with the same NIC already exists", async () => {
+    // Define a test customer with the same NIC
+    const existingCustomer = {
+      firstName: "Alice",
+      lastName: "Smith",
+      email: "alicesmith@example.com",
+      password: "testpassword",
+      dob: "1985-05-05",
+      nic: "123456789V", // Same NIC as in the previous test
+    };
 
-      // Send a POST request to the signUp route
-      const response = await request(app)
-        .post("/api/customers/signUp")
-        .send(testCustomer);
+    // Send a POST request to the signUp route with the existing NIC
+    const response = await request(app)
+      .post("/api/customers/signUp")
+      .send(existingCustomer);
 
-      // Assertions
-      expect(response.status).toBe(201); // Check if the response status is 201 (Created)
-      expect(response.body.success).toBe(true); // Check if the success property is true
-      expect(response.body.message).toBe("Customer registered successfully"); // Check the success message
-
-      // Optional: You can also check the saved customer data from the response, but it may contain sensitive information
-      // For example: expect(response.body.customer.firstName).toBe('John');
-
-      // Check if the customer is saved in the database
-      const savedCustomer = await Customer.findOne({
-        email: testCustomer.email,
-      });
-      expect(savedCustomer).not.toBeNull();
-
-      // Clean up: Delete the test customer from the database
-      await Customer.findByIdAndDelete(savedCustomer._id);
-    });
+    // Assertions
+    expect(response.status).toBe(400); // Check if the response status is 400 (Bad Request)
+    expect(response.body.success).toBe(false); // Check if the success property is false
   });
 });
 

@@ -45,6 +45,8 @@ const commonStyles = StyleSheet.create({
   rowContainer_SpaceBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignContent: "center",
+    alignItems: "center",
   },
   rowContainer_flexStart: {
     flexDirection: "row",

@@ -21,13 +21,14 @@ const topUpScreenStyles = StyleSheet.create({
   input: {
     width: "80%",
     height: 40,
-    borderColor: COLORS.secondaryBlue,
+    backgroundColor: "#ECF1F8",
+    borderColor: COLORS.primary,
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 10,
     padding: 5,
     alignSelf: "center",
-    color: COLORS.white,
+    color: COLORS.primary,
   },
   amountInput: {
     width: "80%",
@@ -65,7 +66,7 @@ const topUpScreenStyles = StyleSheet.create({
   },
 
   inputContainer: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     padding: 20,
     // height: "100%",
     borderRadius: 10,
@@ -76,11 +77,12 @@ const topUpScreenStyles = StyleSheet.create({
   cardLabel: {
     fontSize: 16,
     marginBottom: 5,
-    color: COLORS.white,
+    color: COLORS.black,
+    marginBottom: 10,
   },
 
   submitButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: COLORS.primary,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
@@ -91,7 +93,7 @@ const topUpScreenStyles = StyleSheet.create({
     fontSize: 18,
   },
   popUpContainer: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     borderRadius: 10,
   },
   closeBtn: {

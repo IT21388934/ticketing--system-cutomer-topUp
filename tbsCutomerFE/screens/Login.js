@@ -151,7 +151,7 @@ export default function Login({ navigation }) {
               <View style={loginAndSignUpStyle.inputField}>
                 <TextInput
                   style={loginAndSignUpStyle.input}
-                  placeholder="NIC"
+                  placeholder="NIC or Passport Number"
                   placeholderTextColor={COLORS.darkGray}
                   onChangeText={(text) => setNic(text)}
                   keyboardType="default"

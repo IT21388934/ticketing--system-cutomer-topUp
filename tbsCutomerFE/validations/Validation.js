@@ -34,9 +34,9 @@ export const validateSignUp = (formData) => {
       message: "Password and conform password do not match",
       messageType: "error",
     };
-  } else if (nic.length !== 10) {
+  } else if (nic.length < 10) {
     return {
-      message: "NIC must be 10 characters",
+      message: "NIC or PassPort Number must be more than 10 characters",
       messageType: "error",
     };
   } else if (password.length < 6) {
